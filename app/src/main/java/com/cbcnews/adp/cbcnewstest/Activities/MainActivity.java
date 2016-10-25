@@ -1,5 +1,6 @@
-package com.cbcnews.adp.cbcnewstest;
+package com.cbcnews.adp.cbcnewstest.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,7 +10,20 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.cbcnews.adp.cbcnewstest.App;
+import com.cbcnews.adp.cbcnewstest.Models.News;
+import com.cbcnews.adp.cbcnewstest.NewsRecyclerViewAdapter;
+import com.cbcnews.adp.cbcnewstest.R;
+
+import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
+
 public class MainActivity extends AppCompatActivity {
+
+    private Realm realm;
+    private RealmRecyclerView realmRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +31,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        realm = Realm.getDefaultInstance();
+
+        RealmResults<News> newsResult = realm.where(News.class).findAll();
+        newsResult = newsResult.sort("readablePublishedAt", Sort.ASCENDING);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -26,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        realmRecyclerView = (RealmRecyclerView) findViewById(R.id.realm_recycler_view);
+        NewsRecyclerViewAdapter adapter = new NewsRecyclerViewAdapter(newsResult, this, true, true);
+        realmRecyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -49,4 +71,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
